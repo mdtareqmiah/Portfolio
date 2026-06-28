@@ -47,6 +47,7 @@ body {
     justify-content: space-between;
     align-items: center;
     padding: 1rem 20px;
+    flex-wrap: wrap;
 }
 
 .logo h1 {
@@ -60,7 +61,8 @@ body {
 .nav-menu {
     display: flex;
     list-style: none;
-    gap: 2rem;
+    gap: 1.5rem;
+    align-items: center;
 }
 
 .nav-link {
@@ -69,6 +71,8 @@ body {
     font-weight: 500;
     transition: color 0.3s ease;
     position: relative;
+    white-space: nowrap;
+    font-size: 0.95rem;
 }
 
 .nav-link:hover,
@@ -90,14 +94,17 @@ body {
     display: none;
     flex-direction: column;
     cursor: pointer;
+    gap: 5px;
+    padding: 0.5rem;
 }
 
 .hamburger span {
     width: 25px;
     height: 3px;
     background: var(--text-dark);
-    margin: 5px 0;
-    transition: 0.3s;
+    margin: 0;
+    transition: all 0.3s ease;
+    border-radius: 2px;
 }
 
 /* Hero Section */
@@ -849,15 +856,36 @@ body {
         background: white;
         flex-direction: column;
         gap: 0;
-        padding: 1rem 0;
+        padding: 0;
+        margin: 0;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        z-index: 999;
+        max-height: calc(100vh - 60px);
+        overflow-y: auto;
     }
 
     .nav-menu.active {
         display: flex;
     }
 
+    .nav-menu li {
+        width: 100%;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
     .nav-link {
-        padding: 0.8rem 1.5rem;
+        display: block;
+        padding: 1rem 1.5rem;
+        font-size: 1rem;
+        border-radius: 0;
+    }
+
+    .nav-link.active {
+        background: #f8f9fa;
+    }
+
+    .nav-link.active::after {
+        display: none;
     }
 
     .hamburger {
