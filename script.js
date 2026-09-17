@@ -1,266 +1,185 @@
-// Mobile Navigation Toggle
 const hamburger = document.querySelector('.hamburger');
 const navMenu = document.querySelector('.nav-menu');
 const navLinks = document.querySelectorAll('.nav-link');
 
-hamburger.addEventListener('click', () => {
-    navMenu.classList.toggle('active');
-});
+if (hamburger && navMenu) {
+    hamburger.addEventListener('click', () => {
+        navMenu.classList.toggle('active');
+        const isExpanded = hamburger.getAttribute('aria-expanded') === 'true';
+        hamburger.setAttribute('aria-expanded', String(!isExpanded));
+    });
+}
 
-// Close mobile menu when a link is clicked
 navLinks.forEach(link => {
     link.addEventListener('click', () => {
-        navMenu.classList.remove('active');
+        if (navMenu) {
+            navMenu.classList.remove('active');
+        }
+        if (hamburger) {
+            hamburger.setAttribute('aria-expanded', 'false');
+        }
     });
 });
 
-// Smooth scrolling for navigation links
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
+        const targetSelector = this.getAttribute('href');
+        if (!targetSelector || targetSelector === '#') {
+            return;
+        }
+
+        const target = document.querySelector(targetSelector);
+        if (!target) {
+            return;
+        }
+
         e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
-        if (target) {
-            target.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
+        target.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+        });
+    });
+});
+
+const sectionObserver = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+            const id = entry.target.getAttribute('id');
+            navLinks.forEach(link => {
+                const isActive = link.getAttribute('href') === `#${id}`;
+                link.classList.toggle('active', isActive);
             });
         }
     });
+}, { threshold: 0.35 });
+
+document.querySelectorAll('section[id]').forEach(section => {
+    sectionObserver.observe(section);
 });
 
-// Update active nav link on scroll
-window.addEventListener('scroll', () => {
-    let current = '';
-    const sections = document.querySelectorAll('section');
-
-    sections.forEach(section => {
-        const sectionTop = section.offsetTop;
-        const sectionHeight = section.clientHeight;
-        if (pageYOffset >= sectionTop - 200) {
-            current = section.getAttribute('id');
-        }
-    });
-
-    navLinks.forEach(link => {
-        link.classList.remove('active');
-        if (link.getAttribute('href').slice(1) === current) {
-            link.classList.add('active');
-        }
-    });
-});
-
-// Form submission handler
 const contactForm = document.getElementById('contactForm');
 if (contactForm) {
     contactForm.addEventListener('submit', function (e) {
         e.preventDefault();
 
-        const formData = {
-            name: document.getElementById('name').value,
-            email: document.getElementById('email').value,
-            subject: document.getElementById('subject').value,
-            message: document.getElementById('message').value
-        };
+        const name = document.getElementById('name').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const subject = document.getElementById('subject').value.trim();
+        const message = document.getElementById('message').value.trim();
 
-        // Validate form
-        if (!formData.name || !formData.email || !formData.subject || !formData.message) {
-            alert('Please fill in all fields');
+        if (!name || !email || !subject || !message) {
+            alert('Please fill in all fields.');
             return;
         }
 
-        // Validate email
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(formData.email)) {
-            alert('Please enter a valid email address');
+        if (!emailRegex.test(email)) {
+            alert('Please enter a valid email address.');
             return;
         }
 
-        // Create mailto link for email submission
-        const mailtoLink = `mailto:mdtareqmia25@gmail.com?subject=${encodeURIComponent(formData.subject)}&body=${encodeURIComponent(`Name: ${formData.name}\nEmail: ${formData.email}\n\nMessage:\n${formData.message}`)}`;
+        const mailtoLink = `mailto:mdtareqmia25@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`)}`;
 
-        // Open email client
         window.location.href = mailtoLink;
-
-        // Reset form
         contactForm.reset();
-        alert('Thank you for your message! Your email client is opening...');
+        alert('Your email client is opening so you can send the message.');
     });
 }
 
-// Intersection Observer for fade-in animations
-const observerOptions = {
-    threshold: 0.1,
-    rootMargin: '0px 0px -50px 0px'
+const certificateData = [
+    { src: 'Img/Cloude_Speech_API.png', title: 'Google Cloud Speech API', subtitle: 'Google Cloud' },
+    { src: 'Img/Accelerated_3day.jpeg', title: 'Accelerated 3-Day Programming Bootcamp', subtitle: 'Workshop' },
+    { src: 'Img/VDOAI393-Md._Tareq_Miah_page-0001.jpg', title: 'FutureNation Training', subtitle: 'Video Editing with AI' },
+    { src: 'Img/Volunteer_in_2day_Bootcamp.jpeg', title: 'Volunteer in 2-Day Bootcamp', subtitle: 'Certificate of Participation' },
+    { src: 'Img/3dayworkshop.jpeg', title: '3-Day Workshop', subtitle: 'Workshop' },
+    { src: 'Img/496_Md._Tareq_Miah_Certificate.png', title: 'Certificate', subtitle: 'Profile Achievement' },
+    { src: 'Img/BNCC_camp.jpeg', title: 'BNCC Camp', subtitle: 'Training & Development Program' },
+    { src: 'Img/SIUICTFEST_23.jpeg', title: 'SIU ICT Fest 2023', subtitle: 'Information & Communication Technology Festival' },
+    { src: 'Img/1728-Md._Tareq_Miah__page-0001.jpg', title: 'Certificate', subtitle: 'Verified Achievement' }
+];
+
+const certificateGallery = document.getElementById('certificatesGallery');
+const certificateModal = document.getElementById('certificateModal');
+const certificateModalImage = document.getElementById('certificateModalImage');
+const certificateModalTitle = document.getElementById('certificateModalTitle');
+
+if (certificateGallery) {
+    certificateGallery.innerHTML = certificateData.map((certificate) => `
+        <div class="certificate-item">
+            <div class="certificate-image">
+                <img src="${certificate.src}" alt="${certificate.title} certificate" loading="lazy">
+            </div>
+            <div class="certificate-content">
+                <h4>${certificate.title}</h4>
+                <p>${certificate.subtitle}</p>
+                <button type="button" class="certificate-view-btn" data-src="${certificate.src}" data-title="${certificate.title}">View Certificate</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+const openCertificateModal = (src, title) => {
+    if (!certificateModal || !certificateModalImage || !certificateModalTitle) {
+        return;
+    }
+
+    certificateModalImage.src = src;
+    certificateModalImage.alt = `${title} certificate`;
+    certificateModalTitle.textContent = title;
+    certificateModal.classList.add('active');
+    certificateModal.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
 };
 
-const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.style.animation = 'fadeIn 0.6s ease-out forwards';
-            observer.unobserve(entry.target);
-        }
-    });
-}, observerOptions);
+const closeCertificateModal = () => {
+    if (!certificateModal) {
+        return;
+    }
 
-// Observe all cards and content sections
-document.querySelectorAll('.skill-card, .project-card, .timeline-item, .leadership-item').forEach(el => {
-    el.style.opacity = '0';
-    observer.observe(el);
-});
+    certificateModal.classList.remove('active');
+    certificateModal.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+};
 
-// Add scroll animations for cards
-window.addEventListener('scroll', () => {
-    const cards = document.querySelectorAll('.skill-card, .project-card');
-    
-    cards.forEach(card => {
-        const cardTop = card.getBoundingClientRect().top;
-        const cardBottom = card.getBoundingClientRect().bottom;
-        
-        if (cardTop < window.innerHeight && cardBottom > 0) {
-            card.style.opacity = '1';
-        }
-    });
-});
+document.addEventListener('click', (event) => {
+    const trigger = event.target.closest('.certificate-view-btn');
+    if (trigger) {
+        openCertificateModal(trigger.dataset.src, trigger.dataset.title);
+        return;
+    }
 
-// Smooth scroll to top on page load if there's a hash
-if (window.location.hash) {
-    setTimeout(() => {
-        const target = document.querySelector(window.location.hash);
-        if (target) {
-            target.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
-            });
-        }
-    }, 100);
-}
-
-// Add active state to current page
-document.addEventListener('DOMContentLoaded', () => {
-    const currentHash = window.location.hash;
-    if (currentHash) {
-        navLinks.forEach(link => {
-            if (link.getAttribute('href') === currentHash) {
-                link.classList.add('active');
-            }
-        });
+    if (event.target.matches('[data-close="true"]') || event.target.closest('.certificate-modal-close')) {
+        closeCertificateModal();
     }
 });
 
-// Enhanced interactivity for skill tags
-const skillTags = document.querySelectorAll('.tag, .tech-tag');
-skillTags.forEach(tag => {
-    tag.style.cursor = 'default';
-    tag.addEventListener('mouseenter', function () {
-        this.style.transform = 'scale(1.1)';
-        this.style.transition = 'transform 0.2s ease';
-    });
-    tag.addEventListener('mouseleave', function () {
-        this.style.transform = 'scale(1)';
-    });
-});
+document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && certificateModal && certificateModal.classList.contains('active')) {
+        closeCertificateModal();
+    }
 
-// Add keyboard navigation
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
+    if (event.key === 'Escape' && navMenu) {
         navMenu.classList.remove('active');
     }
 });
 
-// Initialize Intersection Observer for all elements
-document.addEventListener('DOMContentLoaded', () => {
-    const elements = document.querySelectorAll('section');
-    
-    const sectionObserver = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.style.opacity = '1';
-                entry.target.style.transform = 'translateY(0)';
-            }
-        });
-    }, {
-        threshold: 0.1
-    });
-
-    elements.forEach(el => {
-        el.style.opacity = '1';
-        el.style.transform = 'translateY(0)';
-        sectionObserver.observe(el);
-    });
+const revealElements = document.querySelectorAll('.skill-card, .project-card, .timeline-item, .leadership-item, .certificate-item');
+revealElements.forEach((element) => {
+    element.style.opacity = '0';
+    element.style.transform = 'translateY(18px)';
+    element.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
 });
 
-// Print resume functionality
-const addPrintButton = () => {
-    const header = document.querySelector('.hero');
-    const printBtn = document.createElement('button');
-    printBtn.textContent = 'Print Resume';
-    printBtn.className = 'btn btn-secondary';
-    printBtn.style.marginTop = '1rem';
-    printBtn.addEventListener('click', () => {
-        window.print();
-    });
-    // Optionally add to a print menu (commented out to avoid cluttering UI)
-    // header.appendChild(printBtn);
-};
-
-// Call print button on load
-// addPrintButton();
-
-// Smooth number counting animation
-const animateCounters = () => {
-    const counters = document.querySelectorAll('.stat h3');
-    
-    counters.forEach(counter => {
-        const target = parseInt(counter.textContent);
-        const increment = target / 30;
-        let current = 0;
-        
-        const updateCount = () => {
-            current += increment;
-            if (current < target) {
-                counter.textContent = Math.ceil(current) + (counter.textContent.includes('+') ? '+' : '');
-                requestAnimationFrame(updateCount);
-            } else {
-                counter.textContent = counter.textContent;
-            }
-        };
-        
-        // Start animation when element is in view
-        const observer = new IntersectionObserver((entries) => {
-            if (entries[0].isIntersecting) {
-                updateCount();
-                observer.unobserve(counter);
-            }
-        });
-        
-        observer.observe(counter);
-    });
-};
-
-document.addEventListener('DOMContentLoaded', animateCounters);
-
-// Add copy to clipboard functionality for email and phone
-const addCopyButtons = () => {
-    const contactLinks = document.querySelectorAll('.contact-item a');
-    
-    contactLinks.forEach(link => {
-        if (link.href.startsWith('mailto:') || link.href.startsWith('tel:')) {
-            link.style.cursor = 'pointer';
-            link.addEventListener('click', function (e) {
-                if (this.href.startsWith('mailto:')) {
-                    e.preventDefault();
-                    const email = this.href.replace('mailto:', '');
-                    navigator.clipboard.writeText(email).then(() => {
-                        const originalText = this.textContent;
-                        this.textContent = 'Copied!';
-                        setTimeout(() => {
-                            this.textContent = originalText;
-                        }, 2000);
-                    });
-                }
-            });
+const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+            entry.target.style.opacity = '1';
+            entry.target.style.transform = 'translateY(0)';
+            revealObserver.unobserve(entry.target);
         }
     });
-};
+}, { threshold: 0.15 });
 
-document.addEventListener('DOMContentLoaded', addCopyButtons);
+revealElements.forEach((element) => {
+    revealObserver.observe(element);
+});
